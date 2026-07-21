@@ -7,11 +7,11 @@
   publish = "public"
 
 [[redirects]]
-  from = "/api/games/*"
-  to = "/.netlify/functions/game/:splat"
+  from = "/api/games"
+  to = "/.netlify/functions/games"
   status = 200
 
 [[redirects]]
-  from = "/api/games"
-  to = "/.netlify/functions/games"
+  from = "/api/games/*"
+  to = "/.netlify/functions/game/:splat"
   status = 200

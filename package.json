@@ -1,0 +1,14 @@
+{
+  "name": "gameday-live",
+  "version": "1.0.0",
+  "description": "Scoreboard en vivo con panel de encargado y espacios publicitarios, sobre Netlify + Neon",
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.1"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.38.0"
+  },
+  "scripts": {
+    "dev": "netlify dev"
+  }
+}

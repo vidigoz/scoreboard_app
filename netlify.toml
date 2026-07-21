@@ -1,0 +1,17 @@
+[build]
+  functions = "netlify/functions"
+  publish = "public"
+
+[dev]
+  functions = "netlify/functions"
+  publish = "public"
+
+[[redirects]]
+  from = "/api/games/*"
+  to = "/.netlify/functions/game/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/api/games"
+  to = "/.netlify/functions/games"
+  status = 200

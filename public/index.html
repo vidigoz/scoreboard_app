@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GameDay Live</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #F5F1E6; font-family: 'Manrope', system-ui, sans-serif; color: #14213D; }
+  a { color: #1E6B3E; text-decoration: none; }
+  a:hover { color: #F2A93B; }
+  * { box-sizing: border-box; }
+  @keyframes livePulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+  .archivo { font-family: 'Archivo Black', Georgia, serif; }
+  .space { font-family: 'Space Grotesk', system-ui, sans-serif; }
+  input, select, button { font-family: 'Manrope', system-ui, sans-serif; }
+  @media (max-width: 720px) {
+    .sb-row { flex-direction: column !important; }
+    .sb-ad-side { width: 100% !important; height: 60px !important; }
+    .admin-grid { grid-template-columns: 1fr !important; }
+  }
+</style>
+</head>
+<body>
+
+<div style="min-height:100vh;display:flex;flex-direction:column;">
+
+  <header style="display:flex;align-items:center;justify-content:space-between;padding:18px 32px;background:#14213D;flex-wrap:wrap;gap:16px;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:36px;height:36px;background:#F2A93B;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Archivo Black';color:#14213D;font-size:18px;">G</div>
+      <div class="archivo" style="color:#FFFFFF;font-size:20px;letter-spacing:0.5px;">GameDay Live</div>
+    </div>
+    <nav style="display:flex;gap:8px;background:#1D2E52;padding:6px;border-radius:12px;">
+      <button id="tab-search" onclick="setTab('search')" style="padding:10px 16px;border-radius:9px;border:none;font-weight:700;font-size:13px;cursor:pointer;">Buscar juegos</button>
+      <button id="tab-scoreboard" onclick="setTab('scoreboard')" style="padding:10px 16px;border-radius:9px;border:none;font-weight:700;font-size:13px;cursor:pointer;">Marcador en vivo</button>
+      <button id="tab-admin" onclick="setTab('admin')" style="padding:10px 16px;border-radius:9px;border:none;font-weight:700;font-size:13px;cursor:pointer;">Panel del encargado</button>
+    </nav>
+  </header>
+
+  <!-- BUSCAR -->
+  <main id="view-search" style="flex:1;padding:32px;max-width:1100px;margin:0 auto;width:100%;">
+    <h1 class="archivo" style="font-size:32px;margin:0 0 6px;">Juegos cerca de ti</h1>
+    <p style="margin:0 0 24px;color:#5B6478;font-size:15px;">Encuentra el partido que estás viendo y conéctate al marcador en vivo.</p>
+    <input id="searchInput" oninput="onSearch(this.value)" placeholder="Buscar por equipo o estadio..." style="width:100%;padding:14px 16px;border-radius:10px;border:1px solid #DCD5C0;font-size:15px;background:#FFFFFF;color:#14213D;margin-bottom:16px;"/>
+    <div id="cityChips" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px;"></div>
+    <div id="gameList" style="display:flex;flex-direction:column;gap:12px;"></div>
+  </main>
+
+  <!-- MARCADOR -->
+  <main id="view-scoreboard" style="flex:1;padding:20px;display:none;flex-direction:column;align-items:center;gap:16px;">
+    <div style="background:#EFEBDD;border-radius:8px;width:100%;max-width:1200px;height:100px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#9B9481;">Espacio publicitario 970x120</div>
+    <div class="sb-row" style="display:flex;gap:16px;width:100%;max-width:1200px;justify-content:center;">
+      <div class="sb-ad-side" style="background:#EFEBDD;border-radius:8px;width:160px;height:560px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#9B9481;text-align:center;">Anuncio<br>160x600</div>
+      <div style="background:#14213D;border-radius:20px;padding:32px;flex:1;max-width:860px;color:#FFFFFF;">
+        <div id="sbStatus" style="display:flex;justify-content:center;align-items:center;gap:10px;margin-bottom:20px;"></div>
+        <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
+            <div id="sbNameA" class="archivo" style="font-size:22px;text-align:center;"></div>
+            <div id="sbScoreA" class="space" style="font-weight:700;font-size:88px;line-height:1;"></div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px;color:#9AA3B8;">
+            <div id="sbClock" class="space" style="font-size:28px;font-weight:700;color:#F2A93B;"></div>
+            <div id="sbPeriod" style="font-size:14px;font-weight:600;"></div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
+            <div id="sbNameB" class="archivo" style="font-size:22px;text-align:center;"></div>
+            <div id="sbScoreB" class="space" style="font-weight:700;font-size:88px;line-height:1;"></div>
+          </div>
+        </div>
+        <div id="sbLocation" style="margin-top:24px;text-align:center;color:#9AA3B8;font-size:14px;border-top:1px solid #2A3B63;padding-top:16px;"></div>
+      </div>
+      <div class="sb-ad-side" style="background:#EFEBDD;border-radius:8px;width:160px;height:560px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#9B9481;text-align:center;">Anuncio<br>160x600</div>
+    </div>
+    <div id="quickPick" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;"></div>
+    <div style="background:#EFEBDD;border-radius:8px;width:100%;max-width:1200px;height:100px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#9B9481;">Espacio publicitario 970x120</div>
+  </main>
+
+  <!-- ADMIN -->
+  <main id="view-admin" style="flex:1;padding:32px;max-width:1100px;margin:0 auto;width:100%;display:none;">
+    <div id="adminLogin">
+      <h1 class="archivo" style="font-size:28px;margin:0 0 6px;">Panel del encargado</h1>
+      <p style="margin:0 0 20px;color:#5B6478;font-size:14px;">Ingresa la contraseña que te dieron para llevar el marcador.</p>
+      <div style="display:flex;gap:10px;max-width:360px;">
+        <input id="adminPasswordInput" type="password" placeholder="Contraseña" style="flex:1;padding:12px 14px;border-radius:10px;border:1px solid #DCD5C0;font-size:14px;"/>
+        <button onclick="tryLogin()" style="background:#1E6B3E;color:#FFFFFF;border:none;padding:0 20px;border-radius:8px;font-weight:700;cursor:pointer;">Entrar</button>
+      </div>
+      <p id="loginError" style="color:#B3261E;font-size:13px;margin-top:10px;"></p>
+    </div>
+
+    <div id="adminPanel" class="admin-grid" style="display:none;grid-template-columns:1.2fr 1fr;gap:32px;">
+      <div>
+        <h1 class="archivo" style="font-size:28px;margin:0 0 6px;">Panel del encargado</h1>
+        <p style="margin:0 0 20px;color:#5B6478;font-size:14px;">Selecciona el juego y actualiza el marcador en tiempo real.</p>
+
+        <select id="adminSelect" onchange="onAdminSelect(this.value)" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #DCD5C0;margin-bottom:24px;font-size:14px;background:#FFFFFF;"></select>
+
+        <div style="background:#FFFFFF;border:1px solid #E4DFCF;border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:20px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+            <div>
+              <label style="font-size:12px;font-weight:700;color:#5B6478;">EQUIPO A</label>
+              <input id="teamAName" onchange="onField('teamAName', this.value)" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid #DCD5C0;font-size:14px;margin:8px 0;"/>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <button onclick="bumpScore('teamA',-1)" style="width:34px;height:34px;border-radius:8px;border:1px solid #DCD5C0;background:#F5F1E6;font-weight:700;font-size:18px;cursor:pointer;">−</button>
+                <div id="teamAScore" class="space" style="font-weight:700;font-size:28px;min-width:50px;text-align:center;"></div>
+                <button onclick="bumpScore('teamA',1)" style="width:34px;height:34px;border-radius:8px;border:1px solid #DCD5C0;background:#F5F1E6;font-weight:700;font-size:18px;cursor:pointer;">+</button>
+              </div>
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:700;color:#5B6478;">EQUIPO B</label>
+              <input id="teamBName" onchange="onField('teamBName', this.value)" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid #DCD5C0;font-size:14px;margin:8px 0;"/>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <button onclick="bumpScore('teamB',-1)" style="width:34px;height:34px;border-radius:8px;border:1px solid #DCD5C0;background:#F5F1E6;font-weight:700;font-size:18px;cursor:pointer;">−</button>
+                <div id="teamBScore" class="space" style="font-weight:700;font-size:28px;min-width:50px;text-align:center;"></div>
+                <button onclick="bumpScore('teamB',1)" style="width:34px;height:34px;border-radius:8px;border:1px solid #DCD5C0;background:#F5F1E6;font-weight:700;font-size:18px;cursor:pointer;">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+            <div><label style="font-size:12px;font-weight:700;color:#5B6478;">RELOJ / TIEMPO</label><input id="clockInput" onchange="onField('clock', this.value)" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid #DCD5C0;font-size:14px;margin-top:8px;"/></div>
+            <div><label style="font-size:12px;font-weight:700;color:#5B6478;">PERIODO (ENTRADA/CUARTO/SET)</label><input id="periodInput" onchange="onField('period', this.value)" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid #DCD5C0;font-size:14px;margin-top:8px;"/></div>
+          </div>
+
+          <div>
+            <label style="font-size:12px;font-weight:700;color:#5B6478;">ESTADO DEL JUEGO</label>
+            <div id="statusButtons" style="display:flex;gap:8px;margin-top:8px;"></div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+            <div><label style="font-size:12px;font-weight:700;color:#5B6478;">ESTADIO</label><input id="stadiumInput" onchange="onField('stadium', this.value)" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid #DCD5C0;font-size:14px;margin-top:8px;"/></div>
+            <div><label style="font-size:12px;font-weight:700;color:#5B6478;">CIUDAD</label><input id="cityInput" onchange="onField('city', this.value)" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid #DCD5C0;font-size:14px;margin-top:8px;"/></div>
+          </div>
+
+          <div>
+            <label style="font-size:12px;font-weight:700;color:#5B6478;">CREAR JUEGO NUEVO</label>
+            <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+              <input id="newTeamA" placeholder="Equipo local" style="flex:1;min-width:120px;padding:9px 10px;border-radius:8px;border:1px solid #DCD5C0;font-size:13px;"/>
+              <input id="newTeamB" placeholder="Equipo visitante" style="flex:1;min-width:120px;padding:9px 10px;border-radius:8px;border:1px solid #DCD5C0;font-size:13px;"/>
+              <input id="newStadium" placeholder="Estadio" style="flex:1;min-width:120px;padding:9px 10px;border-radius:8px;border:1px solid #DCD5C0;font-size:13px;"/>
+              <input id="newCity" placeholder="Ciudad" style="flex:1;min-width:120px;padding:9px 10px;border-radius:8px;border:1px solid #DCD5C0;font-size:13px;"/>
+              <button onclick="createGame()" style="background:#F2A93B;color:#14213D;border:none;padding:9px 16px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;">Crear</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:12px;font-weight:700;color:#5B6478;margin-bottom:10px;letter-spacing:0.5px;">VISTA PREVIA EN VIVO</div>
+        <div style="background:#14213D;border-radius:16px;padding:24px;color:#FFFFFF;">
+          <div id="previewStatus" style="display:flex;justify-content:center;align-items:center;gap:8px;margin-bottom:14px;"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div id="previewNameA" style="font-weight:800;font-size:15px;"></div>
+            <div id="previewScore" class="space" style="font-weight:700;font-size:40px;"></div>
+            <div id="previewNameB" style="font-weight:800;font-size:15px;"></div>
+          </div>
+          <div id="previewClockPeriod" style="text-align:center;color:#9AA3B8;font-size:12px;margin-top:10px;"></div>
+          <div id="previewLocation" style="text-align:center;color:#6B7690;font-size:12px;margin-top:6px;"></div>
+        </div>
+        <p style="color:#8A8F9C;font-size:13px;margin-top:14px;line-height:1.5;">Los cambios aquí se reflejan al instante en el marcador público y en el listado de juegos.</p>
+      </div>
+    </div>
+  </main>
+
+</div>
+
+<script>
+const STATUS_META = {
+  por_empezar: { label: 'POR EMPEZAR', bg: '#FDEBC7', fg: '#8A5B00', dot: '#D99B1F' },
+  en_vivo:     { label: 'EN VIVO',      bg: '#DCF0E1', fg: '#1E6B3E', dot: '#1E6B3E' },
+  finalizado:  { label: 'FINALIZADO',   bg: '#E8E4D8', fg: '#6B6555', dot: '#8A8266' },
+};
+
+let state = { tab: 'search', search: '', city: 'Todos', selectedId: null, games: [], adminPassword: localStorage.getItem('gd_admin_pw') || '' };
+
+function game(id) { return state.games.find(g => g.id === id); }
+
+async function loadGames() {
+  const res = await fetch('/api/games');
+  state.games = await res.json();
+  if (!state.selectedId && state.games.length) state.selectedId = state.games[0].id;
+  render();
+}
+
+// Netlify Functions es serverless (no mantiene conexiones abiertas), así que
+// en vez de WebSocket usamos polling: cada 4s preguntamos si algo cambió.
+// Si el usuario está escribiendo en un input del panel admin en ese momento,
+// nos saltamos el refresco para no pisarle lo que está tecleando.
+function startPolling() {
+  setInterval(async () => {
+    const typing = document.activeElement && ['INPUT', 'SELECT'].includes(document.activeElement.tagName);
+    if (typing && state.tab === 'admin') return;
+    try {
+      const res = await fetch('/api/games');
+      state.games = await res.json();
+      render();
+    } catch (e) {
+      // si falla un ciclo de polling, simplemente lo reintenta el siguiente
+    }
+  }, 4000);
+}
+
+function setTab(t) { state.tab = t; render(); }
+function onSearch(v) { state.search = v; renderSearch(); }
+function onAdminSelect(id) { state.selectedId = id; renderAdmin(); }
+
+function tryLogin() {
+  const pw = document.getElementById('adminPasswordInput').value;
+  state.adminPassword = pw;
+  localStorage.setItem('gd_admin_pw', pw);
+  document.getElementById('loginError').textContent = '';
+  document.getElementById('adminLogin').style.display = 'none';
+  document.getElementById('adminPanel').style.display = 'grid';
+  renderAdmin();
+}
+
+async function patchGame(patch) {
+  const res = await fetch('/api/games/' + state.selectedId, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'x-admin-password': state.adminPassword },
+    body: JSON.stringify(patch),
+  });
+  if (res.status === 401) {
+    document.getElementById('adminLogin').style.display = 'block';
+    document.getElementById('adminPanel').style.display = 'none';
+    document.getElementById('loginError').textContent = 'Contraseña incorrecta.';
+    return;
+  }
+  const updated = await res.json();
+  const idx = state.games.findIndex(g => g.id === updated.id);
+  if (idx >= 0) state.games[idx] = updated;
+  render();
+}
+
+function onField(key, value) {
+  const g = game(state.selectedId);
+  if (key === 'teamAName') patchGame({ teamAName: value });
+  else if (key === 'teamBName') patchGame({ teamBName: value });
+  else patchGame({ [key]: value });
+}
+function bumpScore(team, delta) {
+  const g = game(state.selectedId);
+  const cur = team === 'teamA' ? g.teamA.score : g.teamB.score;
+  const next = Math.max(0, cur + delta);
+  patchGame(team === 'teamA' ? { teamAScore: next } : { teamBScore: next });
+}
+
+async function createGame() {
+  const body = {
+    teamAName: document.getElementById('newTeamA').value || 'Equipo A',
+    teamBName: document.getElementById('newTeamB').value || 'Equipo B',
+    stadium: document.getElementById('newStadium').value || '',
+    city: document.getElementById('newCity').value || '',
+  };
+  const res = await fetch('/api/games', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-admin-password': state.adminPassword },
+    body: JSON.stringify(body),
+  });
+  if (res.status === 401) {
+    document.getElementById('adminLogin').style.display = 'block';
+    document.getElementById('adminPanel').style.display = 'none';
+    return;
+  }
+  const created = await res.json();
+  state.games.unshift(created);
+  state.selectedId = created.id;
+  ['newTeamA','newTeamB','newStadium','newCity'].forEach(id => document.getElementById(id).value = '');
+  render();
+}
+
+function render() {
+  ['search','scoreboard','admin'].forEach(t => {
+    const btn = document.getElementById('tab-' + t);
+    btn.style.background = state.tab === t ? '#F2A93B' : 'transparent';
+    btn.style.color = state.tab === t ? '#14213D' : '#C7CCDA';
+  });
+  document.getElementById('view-search').style.display = state.tab === 'search' ? 'block' : 'none';
+  document.getElementById('view-scoreboard').style.display = state.tab === 'scoreboard' ? 'flex' : 'none';
+  document.getElementById('view-admin').style.display = state.tab === 'admin' ? 'block' : 'none';
+
+  if (state.tab === 'admin' && state.adminPassword) {
+    document.getElementById('adminLogin').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'grid';
+  }
+
+  renderSearch();
+  renderScoreboard();
+  renderAdmin();
+}
+
+function renderSearch() {
+  const cities = ['Todos', ...new Set(state.games.map(g => g.city).filter(Boolean))];
+  document.getElementById('cityChips').innerHTML = cities.map(c =>
+    `<button onclick="state.city='${c}';renderSearch()" style="padding:8px 16px;border-radius:999px;border:${state.city===c?'none':'1px solid #DCD5C0'};background:${state.city===c?'#14213D':'#FFFFFF'};color:${state.city===c?'#FFFFFF':'#14213D'};font-size:13px;font-weight:700;cursor:pointer;">${c}</button>`
+  ).join('');
+
+  const q = state.search.trim().toLowerCase();
+  const filtered = state.games.filter(g =>
+    (state.city === 'Todos' || g.city === state.city) &&
+    (!q || g.teamA.name.toLowerCase().includes(q) || g.teamB.name.toLowerCase().includes(q) || g.stadium.toLowerCase().includes(q))
+  );
+
+  document.getElementById('gameList').innerHTML = filtered.length ? filtered.map(g => {
+    const m = STATUS_META[g.status];
+    return `<div style="background:#FFFFFF;border:1px solid #E4DFCF;border-radius:14px;padding:18px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:6px;background:${m.bg};color:${m.fg};font-weight:700;font-size:12px;padding:6px 12px;border-radius:999px;">
+        ${g.status === 'en_vivo' ? `<span style="width:8px;height:8px;border-radius:50%;background:${m.dot};display:inline-block;animation:livePulse 1.4s infinite;"></span>` : ''}${m.label}
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:220px;">
+        <div style="font-weight:800;font-size:16px;">${g.teamA.name}</div>
+        <div class="space" style="font-weight:700;font-size:20px;color:#1E6B3E;">${g.teamA.score} - ${g.teamB.score}</div>
+        <div style="font-weight:800;font-size:16px;">${g.teamB.name}</div>
+      </div>
+      <div style="color:#5B6478;font-size:13px;min-width:180px;">${g.stadium} · ${g.city}</div>
+      <button onclick="state.selectedId='${g.id}';setTab('scoreboard')" style="background:#1E6B3E;color:#FFFFFF;border:none;padding:10px 18px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;">Ver marcador</button>
+    </div>`;
+  }).join('') : `<div style="padding:40px;text-align:center;color:#8A8F9C;">No hay juegos que coincidan con tu búsqueda.</div>`;
+}
+
+function renderScoreboard() {
+  const g = game(state.selectedId);
+  if (!g) return;
+  const m = STATUS_META[g.status];
+  document.getElementById('sbStatus').innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:${g.status==='en_vivo'?'#F2A93B':'#6B7690'};display:inline-block;${g.status==='en_vivo'?'animation:livePulse 1.4s infinite;':''}"></span><span style="font-weight:700;letter-spacing:1px;font-size:13px;color:#F2A93B;">${m.label}</span>`;
+  document.getElementById('sbNameA').textContent = g.teamA.name;
+  document.getElementById('sbScoreA').textContent = g.teamA.score;
+  document.getElementById('sbNameB').textContent = g.teamB.name;
+  document.getElementById('sbScoreB').textContent = g.teamB.score;
+  document.getElementById('sbClock').textContent = g.clock;
+  document.getElementById('sbPeriod').textContent = g.period;
+  document.getElementById('sbLocation').textContent = `${g.stadium} · ${g.city}`;
+  document.getElementById('quickPick').innerHTML = state.games.map(gg =>
+    `<button onclick="state.selectedId='${gg.id}';renderScoreboard()" style="padding:8px 14px;border-radius:999px;border:${state.selectedId===gg.id?'none':'1px solid #C9C2AC'};background:${state.selectedId===gg.id?'#1E6B3E':'#FFFFFF'};color:${state.selectedId===gg.id?'#FFFFFF':'#14213D'};font-size:13px;font-weight:700;cursor:pointer;">${gg.teamA.name} vs ${gg.teamB.name}</button>`
+  ).join('');
+}
+
+function renderAdmin() {
+  if (!state.games.length) return;
+  if (!state.selectedId) state.selectedId = state.games[0].id;
+  const g = game(state.selectedId);
+  if (!g) return;
+
+  document.getElementById('adminSelect').innerHTML = state.games.map(ag =>
+    `<option value="${ag.id}" ${ag.id === state.selectedId ? 'selected' : ''}>${ag.teamA.name} vs ${ag.teamB.name} (${ag.city})</option>`
+  ).join('');
+
+  document.getElementById('teamAName').value = g.teamA.name;
+  document.getElementById('teamBName').value = g.teamB.name;
+  document.getElementById('teamAScore').textContent = g.teamA.score;
+  document.getElementById('teamBScore').textContent = g.teamB.score;
+  document.getElementById('clockInput').value = g.clock;
+  document.getElementById('periodInput').value = g.period;
+  document.getElementById('stadiumInput').value = g.stadium;
+  document.getElementById('cityInput').value = g.city;
+
+  document.getElementById('statusButtons').innerHTML = Object.keys(STATUS_META).map(s => {
+    const m = STATUS_META[s]; const active = g.status === s;
+    return `<button onclick="onField('status','${s}')" style="padding:9px 14px;border-radius:8px;border:none;font-weight:700;font-size:12px;cursor:pointer;background:${active?m.dot:'#EFEBDD'};color:${active?'#FFFFFF':'#5B6478'};">${m.label}</button>`;
+  }).join('');
+
+  document.getElementById('previewStatus').innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:${g.status==='en_vivo'?'#F2A93B':'#6B7690'};display:inline-block;${g.status==='en_vivo'?'animation:livePulse 1.4s infinite;':''}"></span><span style="font-weight:700;font-size:12px;color:#F2A93B;letter-spacing:1px;">${STATUS_META[g.status].label}</span>`;
+  document.getElementById('previewNameA').textContent = g.teamA.name;
+  document.getElementById('previewScore').textContent = `${g.teamA.score} - ${g.teamB.score}`;
+  document.getElementById('previewNameB').textContent = g.teamB.name;
+  document.getElementById('previewClockPeriod').textContent = `${g.clock} · ${g.period}`;
+  document.getElementById('previewLocation').textContent = `${g.stadium} · ${g.city}`;
+}
+
+loadGames();
+startPolling();
+</script>
+</body>
+</html>

@@ -32,9 +32,8 @@
       <div class="archivo" style="color:#FFFFFF;font-size:20px;letter-spacing:0.5px;">GameDay Live</div>
     </div>
     <nav style="display:flex;gap:8px;background:#1D2E52;padding:6px;border-radius:12px;">
-      <button id="tab-search" onclick="setTab('search')" style="padding:10px 16px;border-radius:9px;border:none;font-weight:700;font-size:13px;cursor:pointer;">Buscar juegos</button>
-      <button id="tab-scoreboard" onclick="setTab('scoreboard')" style="padding:10px 16px;border-radius:9px;border:none;font-weight:700;font-size:13px;cursor:pointer;">Marcador en vivo</button>
-      <button id="tab-admin" onclick="setTab('admin')" style="padding:10px 16px;border-radius:9px;border:none;font-weight:700;font-size:13px;cursor:pointer;">Panel del encargado</button>
+      <button id="tab-search" onclick="setTab('search')" style="padding:10px 16px;border-radius:9px;border:none;font-weight:700;font-size:13px;cursor:pointer;">Buscar Juego</button>
+      <button id="tab-admin" onclick="setTab('admin')" style="padding:10px 16px;border-radius:9px;border:none;font-weight:700;font-size:13px;cursor:pointer;">Panel</button>
     </nav>
   </header>
 
@@ -80,10 +79,13 @@
   <main id="view-admin" style="flex:1;padding:32px;max-width:1100px;margin:0 auto;width:100%;display:none;">
     <div id="adminLogin">
       <h1 class="archivo" style="font-size:28px;margin:0 0 6px;">Panel del encargado</h1>
-      <p style="margin:0 0 20px;color:#5B6478;font-size:14px;">Ingresa la contraseña que te dieron para llevar el marcador.</p>
-      <div style="display:flex;gap:10px;max-width:360px;">
-        <input id="adminPasswordInput" type="password" placeholder="Contraseña" style="flex:1;padding:12px 14px;border-radius:10px;border:1px solid #DCD5C0;font-size:14px;"/>
-        <button onclick="tryLogin()" style="background:#1E6B3E;color:#FFFFFF;border:none;padding:0 20px;border-radius:8px;font-weight:700;cursor:pointer;">Entrar</button>
+      <p style="margin:0 0 20px;color:#5B6478;font-size:14px;">Ingresa tus credenciales para llevar el marcador.</p>
+      <div style="display:flex;flex-direction:column;gap:10px;max-width:360px;">
+        <input id="adminUsernameInput" type="text" placeholder="Usuario" style="padding:12px 14px;border-radius:10px;border:1px solid #DCD5C0;font-size:14px;"/>
+        <div style="display:flex;gap:10px;">
+          <input id="adminPasswordInput" type="password" placeholder="Contraseña" style="flex:1;padding:12px 14px;border-radius:10px;border:1px solid #DCD5C0;font-size:14px;"/>
+          <button onclick="tryLogin()" style="background:#1E6B3E;color:#FFFFFF;border:none;padding:0 20px;border-radius:8px;font-weight:700;cursor:pointer;">Entrar</button>
+        </div>
       </div>
       <p id="loginError" style="color:#B3261E;font-size:13px;margin-top:10px;"></p>
     </div>
@@ -171,7 +173,7 @@ const STATUS_META = {
   finalizado:  { label: 'FINALIZADO',   bg: '#E8E4D8', fg: '#6B6555', dot: '#8A8266' },
 };
 
-let state = { tab: 'search', search: '', city: 'Todos', selectedId: null, games: [], adminPassword: localStorage.getItem('gd_admin_pw') || '' };
+let state = { tab: 'search', search: '', city: 'Todos', selectedId: null, games: [], adminUsername: localStorage.getItem('gd_admin_user') || '', adminPassword: localStorage.getItem('gd_admin_pw') || '' };
 
 function game(id) { return state.games.find(g => g.id === id); }
 
@@ -205,8 +207,11 @@ function onSearch(v) { state.search = v; renderSearch(); }
 function onAdminSelect(id) { state.selectedId = id; renderAdmin(); }
 
 function tryLogin() {
+  const user = document.getElementById('adminUsernameInput').value.trim();
   const pw = document.getElementById('adminPasswordInput').value;
+  state.adminUsername = user;
   state.adminPassword = pw;
+  localStorage.setItem('gd_admin_user', user);
   localStorage.setItem('gd_admin_pw', pw);
   document.getElementById('loginError').textContent = '';
   document.getElementById('adminLogin').style.display = 'none';
@@ -214,16 +219,24 @@ function tryLogin() {
   renderAdmin();
 }
 
+function authHeaders() {
+  return {
+    'Content-Type': 'application/json',
+    'x-admin-username': state.adminUsername,
+    'x-admin-password': state.adminPassword,
+  };
+}
+
 async function patchGame(patch) {
   const res = await fetch('/api/games/' + state.selectedId, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json', 'x-admin-password': state.adminPassword },
+    headers: authHeaders(),
     body: JSON.stringify(patch),
   });
   if (res.status === 401) {
     document.getElementById('adminLogin').style.display = 'block';
     document.getElementById('adminPanel').style.display = 'none';
-    document.getElementById('loginError').textContent = 'Contraseña incorrecta.';
+    document.getElementById('loginError').textContent = 'Usuario o contraseña incorrectos.';
     return;
   }
   const updated = await res.json();
@@ -254,7 +267,7 @@ async function createGame() {
   };
   const res = await fetch('/api/games', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-admin-password': state.adminPassword },
+    headers: authHeaders(),
     body: JSON.stringify(body),
   });
   if (res.status === 401) {
@@ -270,7 +283,7 @@ async function createGame() {
 }
 
 function render() {
-  ['search','scoreboard','admin'].forEach(t => {
+  ['search','admin'].forEach(t => {
     const btn = document.getElementById('tab-' + t);
     btn.style.background = state.tab === t ? '#F2A93B' : 'transparent';
     btn.style.color = state.tab === t ? '#14213D' : '#C7CCDA';
@@ -279,7 +292,7 @@ function render() {
   document.getElementById('view-scoreboard').style.display = state.tab === 'scoreboard' ? 'flex' : 'none';
   document.getElementById('view-admin').style.display = state.tab === 'admin' ? 'block' : 'none';
 
-  if (state.tab === 'admin' && state.adminPassword) {
+  if (state.tab === 'admin' && state.adminUsername && state.adminPassword) {
     document.getElementById('adminLogin').style.display = 'none';
     document.getElementById('adminPanel').style.display = 'grid';
   }

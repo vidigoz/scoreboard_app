@@ -24,8 +24,9 @@ function rowToGame(row) {
 }
 
 function checkAdmin(event) {
-  const pw = event.headers['x-admin-password'] || event.headers['X-Admin-Password'];
-  return pw === process.env.ADMIN_PASSWORD;
+  const username = event.headers['x-admin-username'] || event.headers['X-Admin-Username'] || '';
+  const password = event.headers['x-admin-password'] || event.headers['X-Admin-Password'] || '';
+  return username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD;
 }
 
 function json(statusCode, data) {

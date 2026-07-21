@@ -47,32 +47,31 @@
   </main>
 
   <!-- MARCADOR -->
-  <main id="view-scoreboard" style="flex:1;padding:20px;display:none;flex-direction:column;align-items:center;gap:16px;">
-    <div style="background:#EFEBDD;border-radius:8px;width:100%;max-width:1200px;height:100px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#9B9481;">Espacio publicitario 970x120</div>
-    <div class="sb-row" style="display:flex;gap:16px;width:100%;max-width:1200px;justify-content:center;">
-      <div class="sb-ad-side" style="background:#EFEBDD;border-radius:8px;width:160px;height:560px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#9B9481;text-align:center;">Anuncio<br>160x600</div>
-      <div style="background:#14213D;border-radius:20px;padding:32px;flex:1;max-width:860px;color:#FFFFFF;">
-        <div id="sbStatus" style="display:flex;justify-content:center;align-items:center;gap:10px;margin-bottom:20px;"></div>
+  <main id="view-scoreboard" style="flex:1;padding:20px;display:none;flex-direction:column;align-items:center;gap:8px;">
+    <img src="/publicidad/h.png" alt="Publicidad" style="border-radius:8px;width:100%;max-width:1200px;height:100px;object-fit:cover;display:block;"/>
+    <div class="sb-row" style="display:flex;gap:16px;width:100%;max-width:1200px;justify-content:center;align-items:flex-start;">
+      <img src="/publicidad/v.png" alt="Publicidad" class="sb-ad-side" style="border-radius:8px;width:100px;align-self:stretch;flex-shrink:0;object-fit:cover;display:block;"/>
+      <div style="background:#14213D;border-radius:20px;padding:28px 40px;flex:1;max-width:860px;color:#FFFFFF;display:flex;flex-direction:column;justify-content:center;aspect-ratio:16/9;">
+        <div id="sbStatus" style="display:flex;justify-content:center;align-items:center;gap:10px;margin-bottom:24px;"></div>
         <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px;">
-          <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
-            <div id="sbNameA" class="archivo" style="font-size:22px;text-align:center;"></div>
-            <div id="sbScoreA" class="space" style="font-weight:700;font-size:88px;line-height:1;"></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+            <div id="sbNameA" class="archivo" style="font-size:34px;text-align:center;"></div>
+            <div id="sbScoreA" class="space" style="font-weight:700;font-size:140px;line-height:1;"></div>
           </div>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:8px;color:#9AA3B8;">
-            <div id="sbClock" class="space" style="font-size:28px;font-weight:700;color:#F2A93B;"></div>
-            <div id="sbPeriod" style="font-size:14px;font-weight:600;"></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;color:#9AA3B8;">
+            <div id="sbClock" class="space" style="font-size:40px;font-weight:700;color:#F2A93B;"></div>
+            <div id="sbPeriod" style="font-size:18px;font-weight:600;"></div>
           </div>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
-            <div id="sbNameB" class="archivo" style="font-size:22px;text-align:center;"></div>
-            <div id="sbScoreB" class="space" style="font-weight:700;font-size:88px;line-height:1;"></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+            <div id="sbNameB" class="archivo" style="font-size:34px;text-align:center;"></div>
+            <div id="sbScoreB" class="space" style="font-weight:700;font-size:140px;line-height:1;"></div>
           </div>
         </div>
-        <div id="sbLocation" style="margin-top:24px;text-align:center;color:#9AA3B8;font-size:14px;border-top:1px solid #2A3B63;padding-top:16px;"></div>
+        <div id="sbLocation" style="margin-top:24px;text-align:center;color:#9AA3B8;font-size:16px;border-top:1px solid #2A3B63;padding-top:16px;"></div>
       </div>
-      <div class="sb-ad-side" style="background:#EFEBDD;border-radius:8px;width:160px;height:560px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#9B9481;text-align:center;">Anuncio<br>160x600</div>
+      <img src="/publicidad/v.png" alt="Publicidad" class="sb-ad-side" style="border-radius:8px;width:100px;align-self:stretch;flex-shrink:0;object-fit:cover;display:block;"/>
     </div>
-    <div id="quickPick" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;"></div>
-    <div style="background:#EFEBDD;border-radius:8px;width:100%;max-width:1200px;height:100px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#9B9481;">Espacio publicitario 970x120</div>
+    <img src="/publicidad/h.png" alt="Publicidad" style="border-radius:8px;width:100%;max-width:1200px;height:100px;object-fit:cover;display:block;"/>
   </main>
 
   <!-- ADMIN -->
@@ -343,9 +342,6 @@ function renderScoreboard() {
   document.getElementById('sbClock').textContent = g.clock;
   document.getElementById('sbPeriod').textContent = g.period;
   document.getElementById('sbLocation').textContent = `${g.stadium} · ${g.city}`;
-  document.getElementById('quickPick').innerHTML = state.games.map(gg =>
-    `<button onclick="state.selectedId='${gg.id}';renderScoreboard()" style="padding:8px 14px;border-radius:999px;border:${state.selectedId===gg.id?'none':'1px solid #C9C2AC'};background:${state.selectedId===gg.id?'#1E6B3E':'#FFFFFF'};color:${state.selectedId===gg.id?'#FFFFFF':'#14213D'};font-size:13px;font-weight:700;cursor:pointer;">${gg.teamA.name} vs ${gg.teamB.name}</button>`
-  ).join('');
 }
 
 function renderAdmin() {
